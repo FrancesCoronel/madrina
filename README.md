@@ -173,6 +173,10 @@ We'll measure success by how satisfied people are with Madrina and by their time
 | | Time-to-promotion study against a sourced baseline | The impact claim |
 | | Move from the deprecated template to Eve | Upkeep |
 
+## Learnings 📝
+
+Doing a timed build soon? Read [docs/LEARNINGS.md](docs/LEARNINGS.md) first. The short version: record a demo as soon as the core flow works, and lock the video well before the deadline.
+
 ## Credits 🙏
 
 - Started from Vercel's [Slack Agent Template](https://github.com/vercel-partner-solutions/slack-agent-template) (MIT), which is now deprecated in favor of [Eve Slack Agent](https://vercel.com/templates/eve/eve-slack-agent). Madrina keeps the template's Bolt + Nitro + Vercel setup and swaps its Workflow SDK agent and AI Gateway for direct Claude calls.
