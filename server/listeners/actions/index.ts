@@ -1,6 +1,7 @@
 import type { App, BlockAction } from "@slack/bolt";
 import { ACTIONS, confirmOnPurpose, draftManagerNote, planNextWeek, runFocusCheck } from "~/lib/slack/checkin";
 import { RUN_CHECKIN_ACTION } from "~/lib/slack/home";
+import { FEEDBACK_ACTION, handleFeedback } from "~/lib/slack/feedback";
 import { rememberDemoUser } from "~/lib/madrina/store";
 
 type Handler = (client: Parameters<typeof draftManagerNote>[0], channel: string, ts: string) => Promise<void>;
@@ -32,6 +33,7 @@ const register = (app: App) => {
   app.action(ACTIONS.draftNote, threadHandler(draftManagerNote));
   app.action(ACTIONS.planWeek, threadHandler(planNextWeek));
   app.action(ACTIONS.onPurpose, threadHandler(confirmOnPurpose));
+  app.action(FEEDBACK_ACTION, handleFeedback);
 };
 
 export default { register };

@@ -4,6 +4,7 @@ import { rewriteWin } from "~/lib/ai/wins";
 import { DEMO_PROFILE_ID } from "~/lib/madrina/data";
 import { addWin, getLastCheckin, listWins, rememberDemoUser } from "~/lib/madrina/store";
 import { markdownToBlocks } from "~/lib/slack/format";
+import { feedbackBlock } from "~/lib/slack/feedback";
 import { publishHome } from "~/lib/slack/home";
 
 const register = (app: App) => {
@@ -53,7 +54,7 @@ const register = (app: App) => {
       }
 
       const reply = await askCoach(message.text);
-      await say({ text: reply, blocks: markdownToBlocks(reply), thread_ts });
+      await say({ text: reply, blocks: [...markdownToBlocks(reply), feedbackBlock()], thread_ts });
     } catch (error) {
       logger.error("DM handler failed:", error);
       await say("Sorry, I hit a snag. Try me again in a moment?");
