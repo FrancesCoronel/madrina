@@ -1,8 +1,18 @@
 import type { KnownBlock, WebClient } from "@slack/web-api";
-import { getGaps, getProfile, matchResource } from "~/lib/madrina/data";
-import { listWins } from "~/lib/madrina/store";
+import { getGaps, getProfile, matchedShelf } from "~/lib/madrina/data";
+import { getShelfCursor, listWins } from "~/lib/madrina/store";
 
 export const RUN_CHECKIN_ACTION = "run_weekly_checkin";
+export const SHELF_NEXT_ACTION = "shelf_next";
+
+const TYPE_EMOJI: Record<string, string> = {
+  book: "📖",
+  talk: "🎤",
+  "blog post": "✍️",
+  course: "🎓",
+  newsletter: "📬",
+  community: "🤝",
+};
 
 const TRACK_LABEL: Record<string, string> = {
   IC: "IC track (Staff, Principal)",
@@ -17,10 +27,11 @@ const SUPPORT_ROLES: { key: string; label: string; hint: string }[] = [
   { key: "coach", label: "Coach", hint: "helps you see your own patterns" },
 ];
 
-export const buildHomeBlocks = (): KnownBlock[] => {
+export const buildHomeBlocks = (userId = ""): KnownBlock[] => {
   const profile = getProfile();
   const gaps = getGaps(profile).slice(0, 3);
-  const resource = matchResource(profile, gaps[0]);
+  const shelf = matchedShelf(profile);
+  const pick = shelf.length ? shelf[getShelfCursor(userId) % shelf.length] : undefined;
   const wins = listWins(profile.id);
   const support = profile.support_system as Record<string, string>;
   const firstName = profile.name.split(" ")[0];
@@ -73,13 +84,49 @@ export const buildHomeBlocks = (): KnownBlock[] => {
     { type: "divider" },
     {
       type: "section",
-      text: {
-        type: "mrkdwn",
-        text: resource
-          ? `*📚 This week's read*\n<${resource.url}|${resource.title}> by ${resource.author} (${resource.type})\nPicked for your biggest gap: *${gaps[0]?.competency ?? "your next level"}*.`
-          : "*📚 This week's read*\nNothing on the shelf matches yet.",
-      },
+      text: { type: "mrkdwn", text: "*📚 From women who've done it*" },
     },
+    ...(pick
+      ? ([
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text:
+                `${TYPE_EMOJI[pick.resource.type] ?? "📚"} *<${pick.resource.url}|${pick.resource.title}>*\n` +
+                `by ${pick.resource.author}  ·  ${pick.resource.type}\n` +
+                (pick.gap
+                  ? `_Why this one:_ it speaks to your *${pick.gap.competency}* gap. ${profile.target_level} expects: "${pick.gap.expectation}"`
+                  : `_Why this one:_ it fits your ${profile.track} track.`),
+            },
+          },
+          {
+            type: "actions",
+            elements: [
+              {
+                type: "button",
+                action_id: "shelf_open",
+                text: { type: "plain_text", text: "Open", emoji: true },
+                url: pick.resource.url,
+              },
+              {
+                type: "button",
+                action_id: SHELF_NEXT_ACTION,
+                text: { type: "plain_text", text: "Show me another", emoji: true },
+              },
+            ],
+          },
+          {
+            type: "context",
+            elements: [
+              {
+                type: "mrkdwn",
+                text: `${(getShelfCursor(userId) % shelf.length) + 1} of ${shelf.length} on your shelf, matched to your gaps. Every author publicly identifies as a woman.`,
+              },
+            ],
+          },
+        ] as KnownBlock[])
+      : ([{ type: "section", text: { type: "mrkdwn", text: "Nothing on the shelf matches yet." } }] as KnownBlock[])),
     { type: "divider" },
     {
       type: "section",
@@ -135,4 +182,4 @@ export const buildHomeBlocks = (): KnownBlock[] => {
 };
 
 export const publishHome = async (client: WebClient, userId: string) =>
-  client.views.publish({ user_id: userId, view: { type: "home", blocks: buildHomeBlocks() } });
+  client.views.publish({ user_id: userId, view: { type: "home", blocks: buildHomeBlocks(userId) } });

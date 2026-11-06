@@ -1,8 +1,8 @@
 import type { App, BlockAction } from "@slack/bolt";
 import { ACTIONS, confirmOnPurpose, draftManagerNote, planNextWeek, runFocusCheck } from "~/lib/slack/checkin";
-import { RUN_CHECKIN_ACTION } from "~/lib/slack/home";
+import { publishHome, RUN_CHECKIN_ACTION, SHELF_NEXT_ACTION } from "~/lib/slack/home";
 import { FEEDBACK_ACTION, handleFeedback } from "~/lib/slack/feedback";
-import { rememberDemoUser } from "~/lib/madrina/store";
+import { nextShelfCursor, rememberDemoUser } from "~/lib/madrina/store";
 
 type Handler = (client: Parameters<typeof draftManagerNote>[0], channel: string, ts: string) => Promise<void>;
 
@@ -29,6 +29,15 @@ const register = (app: App) => {
     } catch (error) {
       logger.error("run_weekly_checkin failed:", error);
     }
+  });
+  app.action(SHELF_NEXT_ACTION, async ({ ack, body, client, logger }) => {
+    await ack();
+    nextShelfCursor(body.user.id);
+    await publishHome(client, body.user.id).catch((e) => logger.error("shelf_next failed:", e));
+  });
+  // URL buttons still send an action; ack it so Slack doesn't show an error.
+  app.action("shelf_open", async ({ ack }) => {
+    await ack();
   });
   app.action(ACTIONS.draftNote, threadHandler(draftManagerNote));
   app.action(ACTIONS.planWeek, threadHandler(planNextWeek));

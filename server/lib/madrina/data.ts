@@ -87,3 +87,22 @@ export const matchResource = (profile: Profile = getProfile(), gap = getGaps(pro
     shelf.find(fits)
   );
 };
+
+export type ShelfItem = { resource: Resource; gap?: Gap };
+
+/** Resources on her track that speak to one of her top gaps, biggest gap first, then the rest of her track. */
+export const matchedShelf = (profile: Profile = getProfile()): ShelfItem[] => {
+  const gaps = getGaps(profile).slice(0, 3);
+  const onTrack = resources.resources.filter((r) => r.tracks.includes(profile.track));
+  const seen = new Set<string>();
+  const items: ShelfItem[] = [];
+  for (const gap of gaps) {
+    for (const r of onTrack) {
+      if (!seen.has(r.title) && r.competencies.includes(gap.competency)) {
+        seen.add(r.title);
+        items.push({ resource: r, gap });
+      }
+    }
+  }
+  return items.length ? items : onTrack.map((resource) => ({ resource }));
+};

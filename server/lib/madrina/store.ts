@@ -28,3 +28,8 @@ export const rememberDemoUser = (userId: string) => {
   demoUser = userId;
 };
 export const getDemoUser = () => process.env.MADRINA_DEMO_USER_ID ?? demoUser;
+
+/** Which shelf card each user is looking at in App Home. */
+const shelfCursor = new Map<string, number>();
+export const getShelfCursor = (userId: string) => shelfCursor.get(userId) ?? 0;
+export const nextShelfCursor = (userId: string) => shelfCursor.set(userId, getShelfCursor(userId) + 1);
