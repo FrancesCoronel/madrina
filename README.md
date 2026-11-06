@@ -1,325 +1,123 @@
-# Slack Agent Template
+<div align="center">
+  <img src="assets/madrina-icon.png" alt="Madrina app icon: a gold north star over rising steps on Latina.dev red" width="160">
+  <h1>Madrina</h1>
+</div>
 
-> [!WARNING]
-> **This repository is deprecated and no longer maintained.**
->
-> Please use the official template instead: **[Eve Slack Agent](https://vercel.com/templates/eve/eve-slack-agent)**.
->
-> The documentation below is preserved for reference only.
+A career coach in Slack for women software engineers, built on Claude. Madrina shows your path to your next level, catches when your work drifts away from what your manager said matters, and turns your wins into promo-ready bullets.
 
-A Slack Agent template built with [Workflow DevKit](https://useworkflow.dev)'s `DurableAgent`, [AI SDK](https://ai-sdk.dev) tools, [Bolt for JavaScript](https://tools.slack.dev/bolt-js/) (TypeScript), and the [Nitro](https://nitro.build) server framework.
+*Madrina* means godmother in Spanish: the woman who vouches for you.
 
-## Features
+## At a glance 🔎
 
-- **[Workflow DevKit](https://useworkflow.dev)** — Make any TypeScript function durable. Build AI agents that can suspend, resume, and maintain state with ease. Reliability-as-code with automatic retries and observability built in
-- **[AI SDK](https://ai-sdk.dev)** — The AI Toolkit for TypeScript. Define type-safe tools with schema validation and switch between AI providers by changing a single line of code
-- **[Vercel AI Gateway](https://vercel.com/ai-gateway)** — One endpoint, all your models. Access hundreds of AI models through a centralized interface with intelligent failovers and no rate limits
-- **[Slack Assistant](https://api.slack.com/docs/apps/ai)** — Integrates with Slack's Assistant API for threaded conversations with real-time streaming responses
-- **[Human-in-the-Loop](./server/lib/ai/workflows/hooks.ts)** — Built-in approval workflows that pause agent execution until a user approves sensitive actions like joining channels
-- **[Built-in Tools](./server/lib/ai/tools.ts)** — Pre-configured tools for reading channels, threads, joining channels (with approval), and searching
+| | |
+| --- | --- |
+| **What** | Slack app (App Home, DMs, @mentions) for career growth toward senior, Staff and Principal roles |
+| **Goal** | Get more women promoted into senior engineering roles, and make the IC track (Staff, Principal) as normal a path as management |
+| **Built at** | Code with Claude: Women in AI Hackathon, Anthropic SF, 2026-11-06 |
+| **Built by** | Frances Coronel |
+| **Status** | Hackathon demo. Runs locally with the Slack CLI; deploys to Vercel |
+| **Data** | 100% synthetic. Ana Rivera, her manager Dana and everyone else in `data/` are made up |
+| **Next** | Ships to the [Latina.dev](https://latina.dev) Slack community |
 
-## Prerequisites
+## The problem 📉
 
-Before getting started, make sure you have a development workspace where you have permissions to install apps. You can use a [developer sandbox](https://api.slack.com/developer-program) or [create a workspace](https://slack.com/create).
+Women don't mostly leave tech because of childcare. They leave because they stop moving up.
 
-## Getting Started
+- **Limited career advancement is the #1 reason women give for leaving tech jobs:** 28% in Indeed's 2018 US survey and 25% in the 2025 Lovelace Report (UK). Childcare comes in at 2 to 3%.
+- **Women are 44% more likely to be asked to do non-promotable tasks** (research behind [*The No Club*](https://www.thenoclub.com)). Glue work keeps teams running and rarely shows up in a promo packet.
+- **The career advice skews male.** Popular engineering newsletters and podcasts mostly feature men. On the Pragmatic Engineer podcast, fewer than 1 in 5 guests are women.
 
-### Clone and install dependencies
+Promotion is an economic mobility lever: level sets pay, equity and who gets the next big project. Madrina sits where the work already happens, in Slack, and helps a woman see her gaps, protect her focus, get credit for her work and find advice from women who've done it.
+
+## What Madrina does ✨
+
+| Feature | What happens |
+| --- | --- |
+| 🏠 **App Home dashboard** | Current → target level and track, top 3 gaps (self-assessment vs. a ladder), one resource by a woman author matched to the biggest gap, wins logged, and the support system (mentor, sponsor, advocate, coach) shown as filled or empty |
+| 🧭 **Weekly focus check** | Compares what her manager said matters (Gateway) with where her pull requests went (7 of 9 to Billing). If more than half went elsewhere, she gets a DM. It also points out that 6 of the 7 Billing asks came by DM and suggests moving them to a channel so the work is visible |
+| ✍️ **Draft a note to my manager** | Claude drafts the note in the thread. Madrina never sends anything to her manager: she drafts, you decide |
+| 🗺️ **Plan next week** | A Monday-to-Friday plan around the priority, each day tied to a Staff competency |
+| 🏆 **Log a win** | Reply with one line. Claude rewrites it as a promo-ready bullet mapped to a ladder competency, and the App Home count updates |
+| 💬 **Coach** | DM or @mention Madrina with a question. Answers use her profile, gaps, focus map and only the curated resource shelf |
+| ⏰ **Cron** | A Vercel cron runs the same focus check every 2 minutes, so the nudge shows up on its own |
+
+The IC track and management are treated as equally valid. Madrina never infers anyone's gender.
+
+## Architecture 🏗️
+
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'fontFamily': 'Lato, sans-serif', 'primaryColor': '#fbe9e9', 'primaryBorderColor': '#9e0001', 'primaryTextColor': '#3b0000', 'lineColor': '#9e0001'}}}%%
+flowchart LR
+  subgraph Slack["Slack workspace"]
+    Home["App Home dashboard"]
+    DM["DMs + buttons"]
+    Mention["@mentions"]
+  end
+  Cron["Vercel Cron<br/>every 2 min"]
+  subgraph App["Madrina on Vercel: Bolt for JS + Nitro"]
+    Events["/api/slack/events"]
+    CronRoute["/api/cron/checkin<br/>CRON_SECRET"]
+    Core["Shared data core<br/>profiles, ladder, feedback,<br/>activity, resources<br/>+ gaps, focus map, wins"]
+  end
+  Claude["Claude Opus 5.5<br/>via @ai-sdk/anthropic"]
+  MCP["MCP connector<br/>get_profile, list_wins, recommend"]:::roadmap
+
+  Home & DM & Mention --> Events
+  Cron --> CronRoute
+  Events --> Core
+  CronRoute --> Core
+  Core <--> Claude
+  Core -. roadmap .- MCP
+
+  classDef roadmap stroke-dasharray: 5 5
+```
+
+- **Slack app:** Bolt for JS on Nitro with `@vercel/slack-bolt`. Every Slack event, button click and command comes in at `/api/slack/events`.
+- **Shared data core:** `server/lib/madrina/` reads the synthetic JSON in `data/`, computes gaps and the focus map, and keeps wins in memory (no database).
+- **Claude:** `server/lib/ai/` calls Claude Opus 5.5 (medium effort) through `@ai-sdk/anthropic` to draft the manager note, plan the week, rewrite wins as structured bullets, and coach.
+- **MCP connector (roadmap):** the same data core exposed as `get_profile`, `list_wins` and `recommend`, so a personal Claude can read it.
+
+## Quick Start 🚀
+
+You need Node 24+, pnpm, the [Slack CLI](https://docs.slack.dev/tools/slack-cli/), an Anthropic API key and a free [ngrok](https://ngrok.com) authtoken.
 
 ```bash
-git clone https://github.com/vercel-partner-solutions/slack-agent-template && cd slack-agent-template && pnpm install
+git clone https://github.com/FrancesCoronel/madrina.git && cd madrina
+pnpm install
+cp .env.example .env
 ```
 
-### Create a Slack App
+Fill in `.env`: `ANTHROPIC_API_KEY`, `NGROK_AUTH_TOKEN`, `SLACK_SIGNING_SECRET` (from your app's Basic Information page), and `ANTHROPIC_WORKSPACE_ID` if your key isn't scoped to a workspace. Then:
 
-1. Open https://api.slack.com/apps/new and choose "From an app manifest"
-2. Choose the workspace you want to use
-3. Copy the contents of [`manifest.json`](./manifest.json) into the text box that says "Paste your manifest code here" (JSON tab) and click Next
-4. Review the configuration and click Create
-5. On the Install App tab, click Install to <Workspace_Name>
-   - You will be redirected to the App Configuration dashboard
-6. Copy the Bot User OAuth Token into your environment as `SLACK_BOT_TOKEN`
-7. On the Basic Information tab, copy your Signing Secret into your environment as `SLACK_SIGNING_SECRET`
-
-### Environment Setup
-
-1. Add your `AI_GATEWAY_API_KEY` to your `.env` file. You can get one [here](https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%2Fapi-keys%3Futm_source%3Dai_gateway_landing_page&title=Get+an+API+Key)
-2. Add your `NGROK_AUTH_TOKEN` to your `.env` file. You can get one [here](https://dashboard.ngrok.com/login?state=X1FFBj9sgtS9-oFK_2-h15Xcg0zHPjp_b9edWYrpGBVvIluUPEAarKRIjpp8ZeCHNTljTyreeslpG6n8anuSCFUkgIxwLypEGOa4Ci_cmnXYLhOfYogHWB6TzWBYUmhFLPW0XeGn789mFV_muomVd7QizkgwuYW8Vz2wW315YIK5UPywQaIGFKV8)
-3. In the terminal run `slack app link`
-4. If prompted `update the manifest source to remote` select `yes`
-5. Copy your App ID from the app you just created
-6. Select `Local` when prompted
-7. Open [`.slack/config.json`](./.slack/config.json) and update your manifest source to `local`
-
-```json
-{
-  "manifest": {
-    "source": "local"
-  },
-  "project_id": "<project-id-added-by-slack-cli>"
-}
+```bash
+slack login
+slack run
 ```
 
-8. Start your local server using `slack run`. If prompted, select the workspace you'd like to grant access to
-   - Select `yes` if asked "Update app settings with changes to the local manifest?"
-9. Open your Slack workspace and add your new Slack Agent to a channel. Your Slack Agent should respond whenever it's tagged in a message or sent a DM
+`slack run` creates the app from `manifest.json`, installs it in the workspace you pick, and tunnels Slack events to your machine. Open Madrina's **Home** tab and click **Run my weekly check-in**.
 
-## Deploy to Vercel
+To deploy, import the repo in Vercel, set the same env vars plus `SLACK_BOT_TOKEN` and a long random `CRON_SECRET`, and point the manifest URLs at `https://<your-app>.vercel.app/api/slack/events`.
 
-1. Create a new Slack app for production following the steps from above
-2. Create a new Vercel project [here](https://vercel.com/new) and select this repo
-3. Copy the Bot User OAuth Token into your Vercel environment variables as `SLACK_BOT_TOKEN`
-4. On the Basic Information tab, copy your Signing Secret into your Vercel environment variables as `SLACK_SIGNING_SECRET`
-5. When your deployment has finished, open your App Manifest from the Slack App Dashboard
-6. Update the manifest so all the `request_url` and `url` fields use `https://<your-app-domain>/api/slack/events`
-7. Click save and you will be prompted to verify the URL
-8. Open your Slack workspace and add your new Slack Agent to a channel. Your Slack Agent should respond whenever it's tagged in a message or sent a DM
-   - _Note_: Make sure you add the production app, not the local app we setup earlier
-9. Your app will now automatically build and deploy whenever you commit to your repo. More information [here](https://vercel.com/docs/git)
+Optional: `scripts/seed-slack.ts` fills a workspace with synthetic project channels and 1:1 threads from `data/slack-seed.json`, as a backdrop for the demo.
 
-## Project Structure
+## Directory Structure 📁
 
-### [`manifest.json`](./manifest.json)
-
-[`manifest.json`](./manifest.json) is a configuration for Slack apps. With a manifest, you can create an app with a pre-defined configuration, or adjust the configuration of an existing app.
-
-### [`/server/app.ts`](./server/app.ts)
-
-[`/server/app.ts`](./server/app.ts) is the entry point of the application. This file is kept minimal and primarily serves to route inbound requests.
-
-### [`/server/lib/ai`](./server/lib/ai)
-
-Contains the AI agent implementation:
-
-- **[`agent.ts`](./server/lib/ai/agent.ts)** — Creates the `DurableAgent` from Workflow with system instructions and available tools. The agent automatically handles tool calling loops until it has enough context to respond.
-
-- **[`tools.ts`](./server/lib/ai/tools.ts)** — Tool definitions using AI SDK's `tool` function:
-  - `getChannelMessages` — Fetches recent messages from a Slack channel
-  - `getThreadMessages` — Fetches messages from a specific thread
-  - `joinChannel` — Joins a public Slack channel (with Human-in-the-Loop approval)
-  - `searchChannels` — Searches for channels by name, topic, or purpose
-
-### [`/server/listeners`](./server/listeners)
-
-Every incoming request is routed to a "listener". Inside this directory, we group each listener based on the Slack Platform feature used:
-
-- [`/listeners/assistant`](./server/listeners/assistant) — Handles Slack Assistant events (thread started, user message, context changed)
-- [`/listeners/actions`](./server/listeners/actions) — Handles interactive component actions (buttons, menus) including HITL approval handlers
-- [`/listeners/shortcuts`](./server/listeners/shortcuts/index.ts) — Handles incoming [Shortcuts](https://api.slack.com/interactivity/shortcuts) requests
-- [`/listeners/views`](./server/listeners/views/index.ts) — Handles [View submissions](https://api.slack.com/reference/interaction-payloads/views#view_submission)
-- [`/listeners/events`](./server/listeners/events) — Handles Slack events like app mentions and home tab opens
-
-### [`/server/api`](./server/api)
-
-This is your Nitro server API directory. Contains [`events.post.ts`](./server/api/slack/events.post.ts) which matches the request URL defined in your [`manifest.json`](./manifest.json). Nitro uses file-based routing for incoming requests. Learn more [here](https://nitro.build/guide/routing).
-
-## Agent Architecture
-
-### Chat Workflow
-
-The core agent loop is implemented as a durable workflow using Workflow DevKit. When a user sends a message, the workflow orchestrates the agent's response with automatic retry handling and streaming support.
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                       Chat Workflow                             │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  User Message ──▶ assistantUserMessage listener                 │
-│                              │                                  │
-│                              ▼                                  │
-│                   ┌─────────────────────┐                       │
-│                   │  start(chatWorkflow)│                       │
-│                   │  with messages +    │                       │
-│                   │  context            │                       │
-│                   └─────────────────────┘                       │
-│                              │                                  │
-│                              ▼                                  │
-│                   ┌─────────────────────┐                       │
-│                   │  createSlackAgent() │                       │
-│                   │  with tools         │                       │
-│                   └─────────────────────┘                       │
-│                              │                                  │
-│                              ▼                                  │
-│                   ┌─────────────────────┐                       │
-│                   │  agent.stream()     │──▶ Tool calls         │
-│                   │  generates response │    (may loop)         │
-│                   └─────────────────────┘                       │
-│                              │                                  │
-│                              ▼                                  │
-│                   ┌─────────────────────┐                       │
-│                   │  Stream chunks to   │                       │
-│                   │  Slack via          │                       │
-│                   │  chatStream()       │                       │
-│                   └─────────────────────┘                       │
-│                              │                                  │
-│                              ▼                                  │
-│                        User sees response                       │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
+```text
+data/              synthetic profiles, ladder, manager feedback, PR activity, resources, Slack seed
+server/api/        Slack events endpoint and the cron route
+server/lib/ai/     Claude calls: voice, coach context, win rewriting
+server/lib/madrina gaps, focus check, in-memory store
+server/lib/slack/  Block Kit for App Home, the check-in DM and replies
+server/listeners/  Bolt listeners for events, messages, actions, commands
+assets/            app icon and custom emoji
 ```
 
-**Key files:**
+## Credits 🙏
 
-- [`/server/lib/ai/workflows/chat.ts`](./server/lib/ai/workflows/chat.ts) — The durable workflow definition using `"use workflow"` directive
-- [`/server/lib/ai/agent.ts`](./server/lib/ai/agent.ts) — Creates the `DurableAgent` with system prompt and tools
-- [`/server/listeners/assistant/assistantUserMessage.ts`](./server/listeners/assistant/assistantUserMessage.ts) — Listener that starts the workflow and streams responses
+- Started from Vercel's [Slack Agent Template](https://github.com/vercel-partner-solutions/slack-agent-template) (MIT), which is now deprecated in favor of [Eve Slack Agent](https://vercel.com/templates/eve/eve-slack-agent). Madrina keeps the template's Bolt + Nitro + Vercel setup and swaps its Workflow SDK agent and AI Gateway for direct Claude calls.
+- The ladder in `data/ladder.json` is a simplified example inspired by public frameworks ([sdras/career-ladders](https://github.com/sdras/career-ladders), Dropbox). It's not any company's real ladder.
+- Every resource Madrina recommends is by women who publicly identify as women: Tanya Reilly, Camille Fournier, Lara Hogan, Sarah Drasner, Cate Huston, Jean Hsu, Julia Evans, Charity Majors, Limor Bergman Gross, the authors of *The No Club*, and the Latina.dev community.
 
-**How it works:**
+## License
 
-1. User sends a message to the Slack Assistant
-2. The `assistantUserMessage` listener collects thread context and starts the workflow
-3. `chatWorkflow` creates the agent and calls `agent.stream()` with the messages
-4. The agent processes the request, calling tools as needed (each tool uses `"use step"` for durability)
-5. Response chunks are streamed back to Slack in real-time via `chatStream()`
-
-### Human-in-the-Loop (HITL) Workflow
-
-This template demonstrates a production-ready Human-in-the-Loop pattern using Workflow DevKit's `defineHook` primitive. When the agent needs to perform sensitive actions (like joining a channel), it pauses execution and waits for user approval.
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         HITL Flow                               │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  User Request ──▶ Agent ──▶ joinChannel Tool                    │
-│                                    │                            │
-│                                    ▼                            │
-│                        ┌─────────────────────┐                  │
-│                        │  Send Slack message │                  │
-│                        │  with Approve/Reject│                  │
-│                        │  buttons            │                  │
-│                        └─────────────────────┘                  │
-│                                    │                            │
-│                                    ▼                            │
-│                        ┌─────────────────────┐                  │
-│                        │  Workflow PAUSES    │                  │
-│                        │  (no compute used)  │◀── await hook    │
-│                        └─────────────────────┘                  │
-│                                    │                            │
-│                         User clicks button                      │
-│                                    │                            │
-│                                    ▼                            │
-│                        ┌─────────────────────┐                  │
-│                        │  Action handler     │                  │
-│                        │  calls hook.resume()│                  │
-│                        └─────────────────────┘                  │
-│                                    │                            │
-│                                    ▼                            │
-│                        ┌─────────────────────┐                  │
-│                        │  Workflow RESUMES   │                  │
-│                        │  with approval data │                  │
-│                        └─────────────────────┘                  │
-│                                    │                            │
-│                                    ▼                            │
-│                           Agent responds                        │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-**Key files:**
-
-- [`/server/lib/ai/workflows/hooks.ts`](./server/lib/ai/workflows/hooks.ts) — Hook definitions for HITL workflows (e.g., `channelJoinApprovalHook`)
-- [`/server/lib/ai/tools.ts`](./server/lib/ai/tools.ts) — Tool definitions including `joinChannel` which uses the approval hook
-- [`/server/lib/slack/blocks.ts`](./server/lib/slack/blocks.ts) — Slack Block Kit UI for approval buttons
-- [`/server/listeners/actions/channel-join-approval.ts`](./server/listeners/actions/channel-join-approval.ts) — Action handler that resumes the workflow
-
-**How it works:**
-
-1. The `joinChannel` tool is called by the agent
-2. A Slack message with Approve/Reject buttons is posted to the thread
-3. `channelJoinApprovalHook.create()` creates a hook instance and the workflow pauses at `await hook`
-4. When the user clicks a button, the action handler calls `hook.resume()` with the decision
-5. The workflow resumes and the agent either joins the channel or acknowledges the rejection
-
-This pattern can be extended for any action requiring human approval (e.g., sending messages, modifying data, external API calls).
-
-## Customizing the Agent
-
-### Modifying Instructions
-
-Edit the `system` prompt in [`/server/lib/ai/agent.ts`](./server/lib/ai/agent.ts) to change how your agent behaves, responds, and uses tools.
-
-### Adding New Tools
-
-1. Add a new tool definition in `/server/lib/ai/tools.ts` using AI SDK's `tool` function:
-
-```typescript
-import { tool } from "ai";
-import { z } from "zod";
-import type { SlackAgentContextInput } from "~/lib/ai/context";
-
-const myNewTool = tool({
-  description: "Description of what this tool does",
-  inputSchema: z.object({
-    param: z.string().describe("Parameter description"),
-  }),
-  execute: async ({ param }, { experimental_context }) => {
-    "use step"; // Required for Workflow's durable execution
-
-    // Dynamic imports inside step to avoid bundling Node.js modules in workflow
-    const { WebClient } = await import("@slack/web-api");
-
-    const ctx = experimental_context as SlackAgentContextInput;
-    const client = new WebClient(ctx.token);
-    // Tool implementation
-    return { result: "..." };
-  },
-});
-```
-
-2. Add it to the `slackTools` export in `/server/lib/ai/tools.ts`
-3. Update the agent instructions in `/server/lib/ai/agent.ts` to describe when to use the new tool
-
-Learn more about building agents with the AI SDK in the [Agents documentation](https://ai-sdk.dev/docs/agents).
-
-### Adding Human-in-the-Loop to Tools
-
-To add approval workflows to your own tools:
-
-1. Add a hook definition to `/server/lib/ai/workflows/hooks.ts`:
-
-```typescript
-import { defineHook } from "workflow";
-import { z } from "zod";
-
-export const myApprovalHook = defineHook({
-  schema: z.object({
-    approved: z.boolean(),
-    // Add any additional data you need
-  }),
-});
-```
-
-2. In your tool's execute function (without `"use step"`), create and await the hook:
-
-```typescript
-execute: async ({ param }, { toolCallId, experimental_context }) => {
-  const ctx = experimental_context as SlackAgentContextInput;
-
-  // Send approval UI to user (in a step)
-  await sendApprovalMessage(ctx, toolCallId);
-
-  // Create hook and wait for approval (in workflow context)
-  const hook = myApprovalHook.create({ token: toolCallId });
-  const { approved } = await hook;
-
-  if (!approved) {
-    return { success: false, message: "User declined" };
-  }
-
-  // Perform the action (in a step)
-  return await performAction(ctx);
-};
-```
-
-3. Create an action handler that calls `hook.resume()` when the user responds
-
-Learn more about hooks in the [Workflow DevKit documentation](https://useworkflow.dev/docs/foundations/hooks).
-
-## Learn More
-
-- [Workflow DevKit Documentation](https://useworkflow.dev/docs)
-- [AI SDK Documentation](https://ai-sdk.dev)
-- [Slack Bolt Documentation](https://tools.slack.dev/bolt-js/)
-- [Slack Assistant API](https://api.slack.com/docs/apps/ai)
-- [Nitro Documentation](https://nitro.build)
+MIT

@@ -3,7 +3,7 @@ import { generateObject } from "ai";
 import { z } from "zod";
 import { ladder } from "~/lib/madrina/data";
 import { getGaps, getProfile, ladderText } from "~/lib/madrina/data";
-import { MODEL_ID } from "./claude";
+import { EFFORT, MODEL_ID } from "./claude";
 
 const workspaceId = process.env.ANTHROPIC_WORKSPACE_ID;
 const anthropic = createAnthropic({
@@ -31,8 +31,8 @@ export const rewriteWin = async (raw: string, { assumeWin = false } = {}): Promi
   const { object } = await generateObject({
     model: anthropic(MODEL_ID),
     schema: WinSchema,
-    maxOutputTokens: 4000,
-    providerOptions: { anthropic: { effort: "low" } },
+    maxOutputTokens: 8000,
+    providerOptions: { anthropic: { effort: EFFORT } },
     system: `You are Madrina, a career coach for women software engineers. You turn one-line wins into promo-ready bullets for a promotion packet. Be warm and specific. Never infer anyone's gender. Never invent metrics.`,
     prompt: `${profile.name} (synthetic) is a ${profile.current_level} engineer on ${profile.team}, going for ${profile.target_level} (${profile.track}). Her biggest gaps: ${gaps}.
 ${profile.target_level} expectations:

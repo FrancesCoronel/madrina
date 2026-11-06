@@ -2,8 +2,9 @@ import { createAnthropic } from "@ai-sdk/anthropic";
 import { generateText, type ModelMessage } from "ai";
 import { MADRINA_EMOJI } from "~/lib/slack/format";
 
-// Latest Claude Sonnet. Override with ANTHROPIC_MODEL if needed.
-export const MODEL_ID = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-5-5";
+// Claude Opus 5.5 at medium effort by default. Override with ANTHROPIC_MODEL / ANTHROPIC_EFFORT.
+export const MODEL_ID = process.env.ANTHROPIC_MODEL ?? "claude-opus-5-5";
+export const EFFORT = (process.env.ANTHROPIC_EFFORT ?? "medium") as "low" | "medium" | "high" | "xhigh" | "max";
 
 // Org-level (non-workspace-scoped) keys must name a workspace on every request.
 const workspaceId = process.env.ANTHROPIC_WORKSPACE_ID;
@@ -38,9 +39,9 @@ export async function askClaude({
     model: anthropic(MODEL_ID),
     system: system ?? MADRINA_VOICE,
     ...(messages ? { messages } : { prompt: prompt ?? "" }),
-    // Sonnet 5.5 thinks by default; low effort keeps replies fast, and the budget leaves room for the answer.
-    maxOutputTokens: 4000,
-    providerOptions: { anthropic: { effort: "low" } },
+    // The model thinks by default; leave room for the answer after thinking.
+    maxOutputTokens: 8000,
+    providerOptions: { anthropic: { effort: EFFORT } },
   });
   return text.trim();
 }
