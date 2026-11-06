@@ -112,6 +112,30 @@ server/listeners/  Bolt listeners for events, messages, actions, commands
 assets/            app icon and custom emoji
 ```
 
+## Roadmap 🗺️
+
+Madrina is meant to live in the Slack workspace you use for work, where your 1:1s, asks and pull requests already are. She speaks up while things are happening, when there's still time to change course. The Latina.dev launch is early access. Members try Madrina, help get it approved at their companies, and become the first pool of mentors and sponsors.
+
+We'll measure success by how satisfied people are with Madrina and by their time to next promotion.
+
+| | Idea | Why |
+| --- | --- | --- |
+| **Now** | Real multi-user onboarding: current level, target level, track, self-assessment | Latina.dev members can't be demo Ana |
+| | Persistent per-user storage, plus "delete my data" | A long-running coach has to remember |
+| | Privacy promise: your data is yours, never your manager's or HR's | Trust now, and the first thing a workspace admin will ask |
+| | Satisfaction pulse, plus last promotion date at onboarding | Starts measuring success on day one |
+| | A richer synthetic Ana, with a glue-work ask like shipping team swag | Gives the demo a story people remember |
+| **Next** | Live glue-work flag in a private 1:1 channel with Madrina in it, plus a drafted hand-off reply | Catches the ask the moment it lands |
+| | "Ask Madrina about this" message shortcut | Covers asks that land anywhere else |
+| | Brag-doc export, wins grouped by competency | Wins turn into a promo packet |
+| | Mentor, sponsor and coach matching across Latina.dev | Fills the support slots no single employer can |
+| | MCP connector: `get_profile`, `list_wins`, `recommend` | Your personal Claude knows your career too |
+| | Real GitHub pull request signals | The focus check on real work instead of synthetic data |
+| **Later** | Slack Marketplace listing and an admin approval kit | The way into work Slack |
+| | Calendar and 1:1 note signals | What your manager actually said matters |
+| | Time-to-promotion study against a sourced baseline | The impact claim |
+| | Move from the deprecated template to Eve | Upkeep |
+
 ## Credits 🙏
 
 - Started from Vercel's [Slack Agent Template](https://github.com/vercel-partner-solutions/slack-agent-template) (MIT), which is now deprecated in favor of [Eve Slack Agent](https://vercel.com/templates/eve/eve-slack-agent). Madrina keeps the template's Bolt + Nitro + Vercel setup and swaps its Workflow SDK agent and AI Gateway for direct Claude calls.
