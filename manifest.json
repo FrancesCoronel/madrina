@@ -31,7 +31,12 @@
         "im:write",
         "im:history",
         "app_mentions:read",
-        "commands"
+        "commands",
+        "chat:write.customize",
+        "channels:manage",
+        "groups:write",
+        "channels:read",
+        "groups:read"
       ]
     }
   },
