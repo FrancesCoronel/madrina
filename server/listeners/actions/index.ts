@@ -3,7 +3,28 @@ import { ACTIONS, confirmOnPurpose, draftManagerNote, planNextWeek, runFocusChec
 import { publishHome, RUN_CHECKIN_ACTION, SHELF_NEXT_ACTION } from "~/lib/slack/home";
 import { FEEDBACK_ACTION, handleFeedback } from "~/lib/slack/feedback";
 import { EXPORT_BRAG_ACTION, exportBragDoc } from "~/lib/slack/brag";
+import { acceptGlueAsk, GLUE_ACTIONS, getGlueAsk, handOffReply, tradeForVisible } from "~/lib/slack/glue";
 import { nextShelfCursor, rememberDemoUser } from "~/lib/madrina/store";
+
+type GlueHandler = (respond: Parameters<typeof handOffReply>[0], ask: NonNullable<ReturnType<typeof getGlueAsk>>) => Promise<void>;
+
+const glueHandler = (fn: GlueHandler) =>
+  (async ({ ack, body, client, respond, logger }) => {
+    await ack();
+    const b = body as BlockAction;
+    const action = b.actions[0];
+    const ask = getGlueAsk(action && "value" in action ? (action.value ?? "") : "");
+    if (!ask) {
+      await respond({ replace_original: true, text: "I lost track of that ask (I restarted). Post it again and I'll take another look." });
+      return;
+    }
+    try {
+      await fn(respond as Parameters<typeof handOffReply>[0], ask);
+      if (action?.action_id === GLUE_ACTIONS.accept) await publishHome(client, b.user.id);
+    } catch (error) {
+      logger.error(`${action?.action_id} failed:`, error);
+    }
+  }) satisfies Parameters<App["action"]>[1];
 
 type Handler = (client: Parameters<typeof draftManagerNote>[0], channel: string, ts: string) => Promise<void>;
 
@@ -49,6 +70,9 @@ const register = (app: App) => {
   app.action(ACTIONS.planWeek, threadHandler(planNextWeek));
   app.action(ACTIONS.onPurpose, threadHandler(confirmOnPurpose));
   app.action(FEEDBACK_ACTION, handleFeedback);
+  app.action(GLUE_ACTIONS.handOff, glueHandler(handOffReply));
+  app.action(GLUE_ACTIONS.trade, glueHandler(tradeForVisible));
+  app.action(GLUE_ACTIONS.accept, glueHandler(acceptGlueAsk));
 };
 
 export default { register };

@@ -15,6 +15,9 @@ const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   receiver,
   deferInitialization: true,
+  // Seed personas (Dana, Priya...) are posted by Madrina's own bot, so don't drop
+  // our own bot messages; each listener skips the ones it shouldn't act on.
+  ignoreSelf: false,
   logLevel,
 });
 

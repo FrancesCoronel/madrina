@@ -139,6 +139,8 @@ async function main() {
         ...(persona.icon_url ? { icon_url: persona.icon_url } : { icon_emoji: persona.icon_emoji }),
         thread_ts,
         unfurl_links: false,
+        // Lets Madrina tell which persona posted, so she only flags asks from someone other than Ana.
+        metadata: { event_type: "madrina_seed", event_payload: { persona: m.from } },
       });
       if (res.ts) tsById[m.id] = res.ts;
       await sleep(1100); // stay under chat.postMessage's ~1/sec per-channel limit

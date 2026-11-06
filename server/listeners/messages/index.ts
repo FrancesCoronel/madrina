@@ -5,9 +5,20 @@ import { DEMO_PROFILE_ID } from "~/lib/madrina/data";
 import { addWin, getLastCheckin, listWins, rememberDemoUser } from "~/lib/madrina/store";
 import { markdownToBlocks } from "~/lib/slack/format";
 import { feedbackBlock } from "~/lib/slack/feedback";
+import { type GroupMessage, maybeFlagGlue } from "~/lib/slack/glue";
 import { publishHome } from "~/lib/slack/home";
 
 const register = (app: App) => {
+  // Private channels Madrina was invited to (like Ana's 1:1 with her manager): flag glue-work asks.
+  app.message(async ({ message, client, logger }) => {
+    if (message.channel_type !== "group") return;
+    try {
+      await maybeFlagGlue(client, message as unknown as GroupMessage);
+    } catch (error) {
+      logger.error("Glue-work flag failed:", error);
+    }
+  });
+
   // Plain DMs to Madrina (Messages tab).
   app.message(async ({ message, say, logger, client }) => {
     if (message.channel_type !== "im") return;
