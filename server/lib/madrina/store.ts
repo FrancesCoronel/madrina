@@ -1,13 +1,22 @@
 // In-memory state for the demo. No database: this resets when the server restarts.
+import winsSeed from "../../../data/wins-seed.json";
 
 export type Win = {
   raw: string;
   bullet: string;
   competency: string;
   at: string;
+  /** True for the synthetic demo seed in data/wins-seed.json. */
+  _synthetic?: boolean;
 };
 
 const wins = new Map<string, Win[]>();
+
+// A month of synthetic wins for Ana so the brag-doc export has something to show.
+// MADRINA_SEED_WINS=0 starts with an empty store instead.
+if (process.env.MADRINA_SEED_WINS !== "0") {
+  wins.set(winsSeed.profile_id, winsSeed.wins.map((w) => ({ ...w })));
+}
 
 export const listWins = (profileId: string): Win[] => wins.get(profileId) ?? [];
 
