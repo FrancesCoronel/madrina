@@ -31,6 +31,8 @@ export const rewriteWin = async (raw: string, { assumeWin = false } = {}): Promi
   const { object } = await generateObject({
     model: anthropic(MODEL_ID),
     schema: WinSchema,
+    maxOutputTokens: 4000,
+    providerOptions: { anthropic: { effort: "low" } },
     system: `You are Madrina, a career coach for women software engineers. You turn one-line wins into promo-ready bullets for a promotion packet. Be warm and specific. Never infer anyone's gender. Never invent metrics.`,
     prompt: `${profile.name} (synthetic) is a ${profile.current_level} engineer on ${profile.team}, going for ${profile.target_level} (${profile.track}). Her biggest gaps: ${gaps}.
 ${profile.target_level} expectations:

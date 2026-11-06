@@ -6,6 +6,13 @@ const PROJECT_REPOS: Record<string, string[]> = {
   Billing: ["billing-service"],
 };
 
+/** Public channels where each project's asks should live (matches data/slack-seed.json). */
+const PROJECT_CHANNELS: Record<string, string> = {
+  Gateway: "proj-gateway-migration",
+  Billing: "team-billing",
+};
+export const channelFor = (project: string) => PROJECT_CHANNELS[project] ?? `${project.toLowerCase()}-requests`;
+
 const repoProject = (repo: string) =>
   Object.entries(PROJECT_REPOS).find(([, repos]) => repos.includes(repo))?.[0] ?? repo;
 

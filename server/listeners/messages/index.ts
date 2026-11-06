@@ -1,5 +1,5 @@
 import type { App } from "@slack/bolt";
-import { askClaude } from "~/lib/ai/claude";
+import { askCoach } from "~/lib/ai/coach";
 import { rewriteWin } from "~/lib/ai/wins";
 import { DEMO_PROFILE_ID } from "~/lib/madrina/data";
 import { addWin, getLastCheckin, listWins, rememberDemoUser } from "~/lib/madrina/store";
@@ -52,7 +52,7 @@ const register = (app: App) => {
         }
       }
 
-      const reply = await askClaude({ prompt: message.text });
+      const reply = await askCoach(message.text);
       await say({ text: reply, blocks: markdownToBlocks(reply), thread_ts });
     } catch (error) {
       logger.error("DM handler failed:", error);

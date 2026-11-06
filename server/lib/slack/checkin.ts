@@ -1,7 +1,7 @@
 import type { KnownBlock, WebClient } from "@slack/web-api";
 import { askClaude, MADRINA_VOICE } from "~/lib/ai/claude";
 import { getGaps, getProfile } from "~/lib/madrina/data";
-import { computeFocus, focusSummary } from "~/lib/madrina/focus";
+import { channelFor, computeFocus, focusSummary } from "~/lib/madrina/focus";
 import { setLastCheckin } from "~/lib/madrina/store";
 import { markdownToBlocks } from "~/lib/slack/format";
 
@@ -32,7 +32,7 @@ export const focusCheckBlocks = (): { text: string; blocks: KnownBlock[] } => {
 
   const main = `*Quick focus check* 🧭\nIn your last 1:1, your manager said *${priority}* is your top priority for the Staff case. This week, *${f.topOtherPrs} of your ${f.totalPrs} pull requests* went to *${f.topOther}*.\n\nWant to redirect next week, or let your manager know about the competing asks?`;
   const dmNote = f.topOtherByDm
-    ? `💬 ${f.topOtherByDm} of those ${f.topOtherPrs} ${f.topOther} requests came in by DM, so nobody else sees that work. Try asking for them in a channel like \`#${f.topOther.toLowerCase()}-requests\`. It makes the load visible and easier to share.`
+    ? `💬 ${f.topOtherByDm} of those ${f.topOtherPrs} ${f.topOther} requests came in by DM, so nobody else sees that work. Ask them to post in *#${channelFor(f.topOther)}* instead. It makes the load visible and easier to share.`
     : "";
 
   const blocks: KnownBlock[] = [
