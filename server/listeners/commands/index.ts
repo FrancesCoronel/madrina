@@ -5,7 +5,7 @@ const register = (app: App) => {
     await ack();
     await respond({
       response_type: "ephemeral",
-      text: "Hi, I'm Madrina 🌱 Open my *Home* tab for your dashboard, or DM me a question about your path to Staff.",
+      text: "Hi, I'm Madrina :madrina: Open my *Home* tab for your dashboard, or DM me a question about your path to Staff.",
     });
   });
 };

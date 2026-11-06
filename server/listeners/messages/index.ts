@@ -33,12 +33,12 @@ const register = (app: App) => {
             at: new Date().toISOString(),
           });
           const count = listWins(DEMO_PROFILE_ID).length;
-          const text = `🏆 Logged. Here's your promo-ready bullet:\n> ${win.bullet}\n*${win.competency}*  ·  ${win.coach_note}`;
+          const text = `:madrina-vouched: Logged. Here's your promo-ready bullet:\n> ${win.bullet}\n*${win.competency}*  ·  ${win.coach_note}`;
           await say({
             text,
             thread_ts,
             blocks: [
-              { type: "section", text: { type: "mrkdwn", text: `🏆 *Logged. Here's your promo-ready bullet:*\n>${win.bullet}` } },
+              { type: "section", text: { type: "mrkdwn", text: `:madrina-vouched: *Logged. Here's your promo-ready bullet:*\n>${win.bullet}` } },
               {
                 type: "context",
                 elements: [

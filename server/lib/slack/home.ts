@@ -43,7 +43,7 @@ export const buildHomeBlocks = (): KnownBlock[] => {
   const blocks: KnownBlock[] = [
     {
       type: "header",
-      text: { type: "plain_text", text: `Hi ${firstName}, it's Madrina 🌱`, emoji: true },
+      text: { type: "plain_text", text: `Hi ${firstName}, it's Madrina :madrina:`, emoji: true },
     },
     {
       type: "section",
@@ -86,7 +86,7 @@ export const buildHomeBlocks = (): KnownBlock[] => {
       fields: [
         {
           type: "mrkdwn",
-          text: `*🏆 Wins logged*\n${wins.length === 0 ? "0 so far. Reply to my check-in with one and I'll make it promo-ready." : `${wins.length} promo-ready ${wins.length === 1 ? "bullet" : "bullets"}`}`,
+          text: `*:promo-ready: Wins logged*\n${wins.length === 0 ? "0 so far. Reply to my check-in with one and I'll make it promo-ready." : `${wins.length} promo-ready ${wins.length === 1 ? "bullet" : "bullets"}`}`,
         },
         {
           type: "mrkdwn",

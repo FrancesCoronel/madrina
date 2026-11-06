@@ -26,11 +26,11 @@ export const focusCheckBlocks = (): { text: string; blocks: KnownBlock[] } => {
   const pct = Math.round(f.drift * 100);
 
   if (f.drift <= DRIFT_THRESHOLD) {
-    const text = `Weekly check-in 🧭 ${f.priorityPrs} of your ${f.totalPrs} pull requests went to ${priority}, which is what your manager said matters most. Nice focus. Got a win from this week? Reply here and I'll make it promo-ready.`;
+    const text = `Weekly check-in :focus-check: ${f.priorityPrs} of your ${f.totalPrs} pull requests went to ${priority}, which is what your manager said matters most. Nice focus. Got a win from this week? Reply here and I'll make it promo-ready.`;
     return { text, blocks: [{ type: "section", text: { type: "mrkdwn", text } }] };
   }
 
-  const main = `*Quick focus check* 🧭\nIn your last 1:1, your manager said *${priority}* is your top priority for the Staff case. This week, *${f.topOtherPrs} of your ${f.totalPrs} pull requests* went to *${f.topOther}*.\n\nWant to redirect next week, or let your manager know about the competing asks?`;
+  const main = `*Quick focus check* :focus-check:\nIn your last 1:1, your manager said *${priority}* is your top priority for the Staff case. This week, *${f.topOtherPrs} of your ${f.totalPrs} pull requests* went to *${f.topOther}*.\n\nWant to redirect next week, or let your manager know about the competing asks?`;
   const dmNote = f.topOtherByDm
     ? `💬 ${f.topOtherByDm} of those ${f.topOtherPrs} ${f.topOther} requests came in by DM, so nobody else sees that work. Ask them to post in *#${channelFor(f.topOther)}* instead. It makes the load visible and easier to share.`
     : "";
@@ -76,7 +76,7 @@ export const focusCheckBlocks = (): { text: string; blocks: KnownBlock[] } => {
     },
   );
 
-  const text = `Quick focus check 🧭 Your manager said ${priority} is your top priority. This week, ${f.topOtherPrs} of your ${f.totalPrs} pull requests went to ${f.topOther}.`;
+  const text = `Quick focus check :focus-check: Your manager said ${priority} is your top priority. This week, ${f.topOtherPrs} of your ${f.totalPrs} pull requests went to ${f.topOther}.`;
   return { text, blocks };
 };
 
