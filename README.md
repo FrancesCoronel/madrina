@@ -40,6 +40,7 @@ Promotion is an economic mobility lever: level sets pay, equity and who gets the
 | 🏆 **Log a win** | Reply with one line. Claude rewrites it as a promo-ready bullet mapped to a ladder competency, and the App Home count updates |
 | 💬 **Coach** | DM or @mention Madrina with a question. Answers use her profile, gaps, focus map and only the curated resource shelf |
 | ⏰ **Cron** | A Vercel cron runs the same focus check every 2 minutes, so the nudge shows up on its own |
+| 🔌 **MCP connector** | Your own Claude can read your Madrina profile, gaps, wins and matched resources through `get_profile`, `list_wins` and `recommend`, so "am I on track for Staff?" gets answered from the same data as Slack |
 
 The IC track and management are treated as equally valid. Madrina never infers anyone's gender.
 
@@ -57,25 +58,25 @@ flowchart LR
   subgraph App["Madrina on Vercel: Bolt for JS + Nitro"]
     Events["/api/slack/events"]
     CronRoute["/api/cron/checkin<br/>CRON_SECRET"]
+    McpRoute["/api/mcp<br/>MCP_TOKEN<br/>get_profile, list_wins, recommend"]
     Core["Shared data core<br/>profiles, ladder, feedback,<br/>activity, resources<br/>+ gaps, focus map, wins"]
   end
   Claude["Claude Opus 5.5<br/>via @ai-sdk/anthropic"]
-  MCP["MCP connector<br/>get_profile, list_wins, recommend"]:::roadmap
+  Personal["Your Claude<br/>Claude Desktop, Claude Code"]
 
   Home & DM & Mention --> Events
   Cron --> CronRoute
+  Personal --> McpRoute
   Events --> Core
   CronRoute --> Core
+  McpRoute --> Core
   Core <--> Claude
-  Core -. roadmap .- MCP
-
-  classDef roadmap stroke-dasharray: 5 5
 ```
 
 - **Slack app:** Bolt for JS on Nitro with `@vercel/slack-bolt`. Every Slack event, button click and command comes in at `/api/slack/events`.
 - **Shared data core:** `server/lib/madrina/` reads the synthetic JSON in `data/`, computes gaps and the focus map, and keeps wins in memory (no database).
 - **Claude:** `server/lib/ai/` calls Claude Opus 5.5 (medium effort) through `@ai-sdk/anthropic` to draft the manager note, plan the week, rewrite wins as structured bullets, and coach.
-- **MCP connector (roadmap):** the same data core exposed as `get_profile`, `list_wins` and `recommend`, so a personal Claude can read it.
+- **MCP connector:** `/api/mcp` serves the same data core over MCP Streamable HTTP as three read-only tools: `get_profile` (level, target, track, gaps, support system), `list_wins` (promo bullets with competencies) and `recommend` (only items from `data/resources.json`, matched to her gaps). It's guarded by a bearer token, `MCP_TOKEN`, which stands for the demo user. Code is in `server/api/mcp.ts` and `server/lib/mcp/`.
 
 ## Quick Start 🚀
 
@@ -98,15 +99,51 @@ slack run
 
 To deploy, import the repo in Vercel, set the same env vars plus `SLACK_BOT_TOKEN` and a long random `CRON_SECRET`, and point the manifest URLs at `https://<your-app>.vercel.app/api/slack/events`.
 
+### Connect your Claude 🔌
+
+The MCP connector runs in the same server as the Slack app. Add `MCP_TOKEN` (any long random string) to `.env`, run `slack run`, and point your Claude at `http://localhost:3000/api/mcp`.
+
+**Claude Code:**
+
+```bash
+claude mcp add --transport http madrina http://localhost:3000/api/mcp --header "Authorization: Bearer $MCP_TOKEN"
+```
+
+**Claude Desktop:** add this to `claude_desktop_config.json` (Settings → Developer → Edit Config), put your token in place of `YOUR_MCP_TOKEN`, and restart Desktop. [`mcp-remote`](https://www.npmjs.com/package/mcp-remote) bridges Desktop to the local HTTP server.
+
+```json
+{
+  "mcpServers": {
+    "madrina": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "http://localhost:3000/api/mcp", "--header", "Authorization: Bearer YOUR_MCP_TOKEN"]
+    }
+  }
+}
+```
+
+Then ask: "Am I on track for Staff? What should I read next?"
+
+**claude.ai:** custom connectors there sign in with OAuth and can't send a fixed bearer token, so claude.ai waits on per-user OAuth (see the roadmap).
+
+⚠️ **Run it locally, in one process.** Wins live in memory. On Vercel, an MCP request can land on a different instance than the one that handled your Slack reply, and it will see no wins. Locally, `slack run` serves Slack and `/api/mcp` from one process, so a win you log in Slack shows up in `list_wins` right away. Persistent storage (on the roadmap) fixes this for deploys.
+
+To check the route by hand:
+
+```bash
+curl -s http://localhost:3000/api/mcp -H "Authorization: Bearer $MCP_TOKEN" -H "Content-Type: application/json" -H "Accept: application/json, text/event-stream" -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"get_profile","arguments":{}}}'
+```
+
 Optional: `scripts/seed-slack.ts` fills a workspace with synthetic project channels and 1:1 threads from `data/slack-seed.json`, as a backdrop for the demo.
 
 ## Directory Structure 📁
 
 ```text
 data/              synthetic profiles, ladder, manager feedback, PR activity, resources, Slack seed
-server/api/        Slack events endpoint and the cron route
+server/api/        Slack events endpoint, the cron route and the MCP route
 server/lib/ai/     Claude calls: voice, coach context, win rewriting
 server/lib/madrina gaps, focus check, in-memory store
+server/lib/mcp/    MCP server: get_profile, list_wins, recommend
 server/lib/slack/  Block Kit for App Home, the check-in DM and replies
 server/listeners/  Bolt listeners for events, messages, actions, commands
 assets/            app icon and custom emoji
@@ -129,7 +166,7 @@ We'll measure success by how satisfied people are with Madrina and by their time
 | | "Ask Madrina about this" message shortcut | Covers asks that land anywhere else |
 | | Brag-doc export, wins grouped by competency | Wins turn into a promo packet |
 | | Mentor, sponsor and coach matching across Latina.dev | Fills the support slots no single employer can |
-| | MCP connector: `get_profile`, `list_wins`, `recommend` | Your personal Claude knows your career too |
+| | Per-user OAuth for the MCP connector | Each member connects her own Claude, claude.ai included, and sees only her own data |
 | | Real GitHub pull request signals | The focus check on real work instead of synthetic data |
 | **Later** | Slack Marketplace listing and an admin approval kit | The way into work Slack |
 | | Calendar and 1:1 note signals | What your manager actually said matters |
