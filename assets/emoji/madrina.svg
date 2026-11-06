@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="128" height="128">
+  <!-- :madrina: app mark, same art as madrina-icon.svg in a rounded square. -->
+  <defs>
+    <clipPath id="r"><rect width="512" height="512" rx="112"/></clipPath>
+    <radialGradient id="bg" cx="60%" cy="36%" r="80%"><stop offset="0" stop-color="#b30a0b"/><stop offset="0.55" stop-color="#9e0001"/><stop offset="1" stop-color="#5e0000"/></radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ffc101" stop-opacity="0.35"/><stop offset="1" stop-color="#ffc101" stop-opacity="0"/></radialGradient>
+  </defs>
+  <g clip-path="url(#r)">
+    <rect width="512" height="512" fill="url(#bg)"/>
+    <circle cx="306" cy="196" r="190" fill="url(#glow)"/>
+    <circle cx="96" cy="430" r="22" fill="#ffffff" opacity="0.6"/>
+    <circle cx="146" cy="358" r="26" fill="#ffffff" opacity="0.8"/>
+    <circle cx="212" cy="298" r="30" fill="#ffffff"/>
+    <path fill="#ffc101" d="M306 60 Q326 176 442 196 Q326 216 306 332 Q286 216 170 196 Q286 176 306 60Z"/>
+  </g>
+</svg>

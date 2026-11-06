@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Madrina app icon: a north star with a rising path of steps toward it (your level -> your target).
+       Palette from Latina.dev: royal red #9e0001, red-900 #5e0000, gold #ffc101. -->
+  <defs>
+    <radialGradient id="bg" cx="60%" cy="36%" r="80%">
+      <stop offset="0" stop-color="#b30a0b"/>
+      <stop offset="0.55" stop-color="#9e0001"/>
+      <stop offset="1" stop-color="#5e0000"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ffc101" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#ffc101" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <circle cx="306" cy="196" r="190" fill="url(#glow)"/>
+  <!-- the path: steps rising toward the star -->
+  <circle cx="92" cy="438" r="17" fill="#ffffff" opacity="0.55"/>
+  <circle cx="140" cy="364" r="21" fill="#ffffff" opacity="0.75"/>
+  <circle cx="208" cy="302" r="25" fill="#ffffff"/>
+  <!-- the north star -->
+  <path fill="#ffc101" d="M306 60 Q326 176 442 196 Q326 216 306 332 Q286 216 170 196 Q286 176 306 60Z"/>
+  <path fill="#ffffff" opacity="0.9" d="M122 104 Q125 125 146 128 Q125 131 122 152 Q119 131 98 128 Q119 125 122 104Z"/>
+</svg>
