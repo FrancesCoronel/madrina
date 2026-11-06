@@ -36,7 +36,9 @@
         "channels:manage",
         "groups:write",
         "channels:read",
-        "groups:read"
+        "groups:read",
+        "canvases:write",
+        "files:write"
       ]
     }
   },

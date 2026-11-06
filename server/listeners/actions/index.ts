@@ -2,6 +2,7 @@ import type { App, BlockAction } from "@slack/bolt";
 import { ACTIONS, confirmOnPurpose, draftManagerNote, planNextWeek, runFocusCheck } from "~/lib/slack/checkin";
 import { publishHome, RUN_CHECKIN_ACTION, SHELF_NEXT_ACTION } from "~/lib/slack/home";
 import { FEEDBACK_ACTION, handleFeedback } from "~/lib/slack/feedback";
+import { EXPORT_BRAG_ACTION, exportBragDoc } from "~/lib/slack/brag";
 import { nextShelfCursor, rememberDemoUser } from "~/lib/madrina/store";
 
 type Handler = (client: Parameters<typeof draftManagerNote>[0], channel: string, ts: string) => Promise<void>;
@@ -29,6 +30,11 @@ const register = (app: App) => {
     } catch (error) {
       logger.error("run_weekly_checkin failed:", error);
     }
+  });
+  app.action(EXPORT_BRAG_ACTION, async ({ ack, body, client, logger }) => {
+    await ack();
+    rememberDemoUser(body.user.id);
+    await exportBragDoc(client, body.user.id).catch((e) => logger.error("export_brag_doc failed:", e));
   });
   app.action(SHELF_NEXT_ACTION, async ({ ack, body, client, logger }) => {
     await ack();

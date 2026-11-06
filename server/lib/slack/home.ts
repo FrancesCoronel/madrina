@@ -1,6 +1,7 @@
 import type { KnownBlock, WebClient } from "@slack/web-api";
 import { getGaps, getProfile, matchedShelf } from "~/lib/madrina/data";
 import { getShelfCursor, listWins } from "~/lib/madrina/store";
+import { EXPORT_BRAG_ACTION } from "~/lib/slack/brag";
 
 export const RUN_CHECKIN_ACTION = "run_weekly_checkin";
 export const SHELF_NEXT_ACTION = "shelf_next";
@@ -71,6 +72,12 @@ export const buildHomeBlocks = (userId = ""): KnownBlock[] => {
           action_id: RUN_CHECKIN_ACTION,
           style: "primary",
           text: { type: "plain_text", text: "Run my weekly check-in", emoji: true },
+          value: profile.id,
+        },
+        {
+          type: "button",
+          action_id: EXPORT_BRAG_ACTION,
+          text: { type: "plain_text", text: "Export my brag doc", emoji: true },
           value: profile.id,
         },
       ],
