@@ -1,0 +1,51 @@
+{
+  "display_information": {
+    "name": "Madrina",
+    "description": "Career coach for women software engineers, built on Claude",
+    "long_description": "Madrina is a career coach in Slack for women software engineers. She shows your path from your current level to your target level, spots when your work drifts away from what your manager said matters, helps you log wins as promo-ready bullets, and recommends resources by women authors. All demo data is synthetic.",
+    "background_color": "#4a154b"
+  },
+  "features": {
+    "app_home": {
+      "home_tab_enabled": true,
+      "messages_tab_enabled": true,
+      "messages_tab_read_only_enabled": false
+    },
+    "bot_user": {
+      "display_name": "Madrina",
+      "always_online": true
+    },
+    "slash_commands": [
+      {
+        "command": "/madrina",
+        "url": "https://your-app-domain.com/api/slack/events",
+        "description": "Say hi to Madrina",
+        "should_escape": false
+      }
+    ]
+  },
+  "oauth_config": {
+    "scopes": {
+      "bot": [
+        "chat:write",
+        "im:write",
+        "im:history",
+        "app_mentions:read",
+        "commands"
+      ]
+    }
+  },
+  "settings": {
+    "event_subscriptions": {
+      "request_url": "https://your-app-domain.com/api/slack/events",
+      "bot_events": ["app_home_opened", "app_mention", "message.im"]
+    },
+    "interactivity": {
+      "is_enabled": true,
+      "request_url": "https://your-app-domain.com/api/slack/events"
+    },
+    "org_deploy_enabled": false,
+    "socket_mode_enabled": false,
+    "token_rotation_enabled": false
+  }
+}
