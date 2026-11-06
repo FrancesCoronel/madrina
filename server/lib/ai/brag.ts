@@ -135,8 +135,8 @@ ${gapCompetencies.map((c) => `- ${c}: ${profile.target_level} expects "${expecta
   const title = `${profile.name}: brag doc for ${profile.target_level}`;
   const anySynthetic = wins.some((w) => w._synthetic);
 
+  // No `# title` line: the canvas title already shows it as the header.
   const lines: string[] = [
-    `# ${title}`,
     `${profile.current_level} → ${profile.target_level} · ${profile.track} track · ${profile.team}`,
     `${wins.length} logged ${wins.length === 1 ? "win" : "wins"}, ${span}. Every line below comes from a win you logged with Madrina. Edit anything, then share it with whoever you choose.`,
     "",

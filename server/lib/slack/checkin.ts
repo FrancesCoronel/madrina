@@ -117,21 +117,60 @@ const replyInThread = async (
   }
 };
 
+const ONE_ON_ONE_CHANNEL = "ana-dana-1on1";
+
+/** Link to the private 1:1 channel (if Madrina is in it), so she can paste the draft there herself. */
+const oneOnOneLink = async (client: WebClient): Promise<string | undefined> => {
+  try {
+    const [{ team_id }, list] = await Promise.all([
+      client.auth.test(),
+      client.conversations.list({ types: "private_channel,public_channel", limit: 200, exclude_archived: true }),
+    ]);
+    const ch = list.channels?.find((c) => c.name === ONE_ON_ONE_CHANNEL);
+    return ch?.id && team_id ? `https://slack.com/app_redirect?team=${team_id}&channel=${ch.id}` : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
 export const draftManagerNote = (client: WebClient, channel: string, thread_ts: string) =>
   replyInThread(client, channel, thread_ts, "✍️ Drafting a note you can send your manager...", async () => {
-    const draft = await askClaude({
-      system: `${MADRINA_VOICE}\n\nTask: write a short Slack message that Ana can send to her manager herself. First person, as Ana. 4 to 6 sentences. Name the competing Billing asks and that most arrived by DM, restate that Gateway is the Staff priority, and ask one concrete question (for example, should Billing asks go through a channel, or who else can pick them up). Confident, not apologetic. Output only the message body.`,
-      prompt: context(),
-    });
-    const intro = "Here's a draft. I won't send it. Copy it, make it yours, and send it if it feels right.";
+    const [draft, link] = await Promise.all([
+      askClaude({
+        system: `You write short Slack messages that an engineer sends to her manager herself. Write as Ana, first person, to her manager Dana. Exactly 3 sentences, under 60 words total, plain text: no greeting line, no sign-off, no emoji, no bold, no bullets, no headings, no em dashes. Sentence 1: Gateway is her Staff priority but most of this week went to Billing asks that came in by DM. Sentence 2: she wants Billing asks to go through #team-billing so the load is visible. Sentence 3: one concrete question for Dana. Confident, not apologetic. Use only facts from the context. Output only the message.`,
+        prompt: context(),
+      }),
+      oneOnOneLink(client),
+    ]);
+    const quoted = draft
+      .trim()
+      .split("\n")
+      .map((l) => `>${l}`)
+      .join("\n");
     return {
-      text: `${intro}\n\n${draft}`,
+      text: `Here's a draft for Dana. I won't send it.\n\n${draft}`,
       blocks: [
-        { type: "section", text: { type: "mrkdwn", text: `*${intro}*` } },
-        ...markdownToBlocks(draft),
+        { type: "section", text: { type: "mrkdwn", text: "*Here's a draft for Dana.* Make it yours. I won't send it." } },
+        { type: "section", text: { type: "mrkdwn", text: quoted } },
+        ...(link
+          ? ([
+              {
+                type: "actions",
+                elements: [
+                  {
+                    type: "button",
+                    action_id: "open_one_on_one",
+                    style: "primary",
+                    text: { type: "plain_text", text: `Open #${ONE_ON_ONE_CHANNEL}`, emoji: true },
+                    url: link,
+                  },
+                ],
+              },
+            ] as KnownBlock[])
+          : []),
         {
           type: "context",
-          elements: [{ type: "mrkdwn", text: "📝 Draft only. Madrina never messages your manager for you." }],
+          elements: [{ type: "mrkdwn", text: "📝 Draft only. Copy it into your 1:1 channel and send it yourself if it feels right." }],
         },
       ],
     };

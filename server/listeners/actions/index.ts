@@ -63,6 +63,9 @@ const register = (app: App) => {
     await publishHome(client, body.user.id).catch((e) => logger.error("shelf_next failed:", e));
   });
   // URL buttons still send an action; ack it so Slack doesn't show an error.
+  app.action("open_one_on_one", async ({ ack }) => {
+    await ack();
+  });
   app.action("shelf_open", async ({ ack }) => {
     await ack();
   });
