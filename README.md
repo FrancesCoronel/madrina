@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/madrina-icon.png" alt="Madrina app icon: a gold north star over rising steps on Latina.dev red" width="160">
+  <img src="assets/madrina-icon.png" alt="Madrina app icon: a white owl with her ahijada (godchild) tucked under her wing, on Latina.dev red" width="160">
   <h1>Madrina</h1>
 </div>
 
