@@ -1,5 +1,6 @@
 import type { AllMiddlewareArgs, SlackEventMiddlewareArgs } from "@slack/bolt";
 import { askClaude } from "~/lib/ai/claude";
+import { markdownToBlocks } from "~/lib/slack/format";
 
 const appMentionCallback = async ({
   event,
@@ -10,7 +11,7 @@ const appMentionCallback = async ({
   const question = event.text.replace(/<@[A-Z0-9]+>/g, "").trim();
   try {
     const reply = await askClaude({ prompt: question || "Say hi briefly." });
-    await say({ text: reply, thread_ts });
+    await say({ text: reply, blocks: markdownToBlocks(reply), thread_ts });
   } catch (error) {
     logger.error("app_mention handler failed:", error);
     await say({
