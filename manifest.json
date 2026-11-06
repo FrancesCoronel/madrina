@@ -18,7 +18,7 @@
     "slash_commands": [
       {
         "command": "/madrina",
-        "url": "https://your-app-domain.com/api/slack/events",
+        "url": "https://depth-debunk-tasting.ngrok-free.dev/api/slack/events",
         "description": "Say hi to Madrina",
         "should_escape": false
       }
@@ -37,12 +37,16 @@
   },
   "settings": {
     "event_subscriptions": {
-      "request_url": "https://your-app-domain.com/api/slack/events",
-      "bot_events": ["app_home_opened", "app_mention", "message.im"]
+      "request_url": "https://depth-debunk-tasting.ngrok-free.dev/api/slack/events",
+      "bot_events": [
+        "app_home_opened",
+        "app_mention",
+        "message.im"
+      ]
     },
     "interactivity": {
       "is_enabled": true,
-      "request_url": "https://your-app-domain.com/api/slack/events"
+      "request_url": "https://depth-debunk-tasting.ngrok-free.dev/api/slack/events"
     },
     "org_deploy_enabled": false,
     "socket_mode_enabled": false,
