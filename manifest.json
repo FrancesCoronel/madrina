@@ -38,7 +38,8 @@
         "channels:read",
         "groups:read",
         "canvases:write",
-        "files:write"
+        "files:write",
+        "groups:history"
       ]
     }
   },
@@ -48,7 +49,8 @@
       "bot_events": [
         "app_home_opened",
         "app_mention",
-        "message.im"
+        "message.im",
+        "message.groups"
       ]
     },
     "interactivity": {

@@ -1,5 +1,6 @@
 import type { KnownBlock, WebClient } from "@slack/web-api";
 import { getGaps, getProfile, matchedShelf } from "~/lib/madrina/data";
+import { listGlue } from "~/lib/madrina/glue";
 import { getShelfCursor, listWins } from "~/lib/madrina/store";
 import { EXPORT_BRAG_ACTION } from "~/lib/slack/brag";
 
@@ -34,6 +35,7 @@ export const buildHomeBlocks = (userId = ""): KnownBlock[] => {
   const shelf = matchedShelf(profile);
   const pick = shelf.length ? shelf[getShelfCursor(userId) % shelf.length] : undefined;
   const wins = listWins(profile.id);
+  const glue = listGlue(profile.id);
   const support = profile.support_system as Record<string, string>;
   const firstName = profile.name.split(" ")[0];
   const emptyRoles = SUPPORT_ROLES.filter((r) => support[r.key] !== "filled");
@@ -141,6 +143,10 @@ export const buildHomeBlocks = (userId = ""): KnownBlock[] => {
         {
           type: "mrkdwn",
           text: `*:promo-ready: Wins logged*\n${wins.length === 0 ? "0 so far. Reply to my check-in with one and I'll make it promo-ready." : `${wins.length} promo-ready ${wins.length === 1 ? "bullet" : "bullets"}`}`,
+        },
+        {
+          type: "mrkdwn",
+          text: `*:yarn: Glue work*\n${glue.length} ${glue.length === 1 ? "task" : "tasks"} on record. Useful, and none of it counts toward ${profile.target_level} unless you claim it.`,
         },
         {
           type: "mrkdwn",
