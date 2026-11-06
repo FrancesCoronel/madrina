@@ -11,49 +11,49 @@
       "role": "Senior Engineer, Payments Platform",
       "icon_emoji": ":woman-technologist:",
       "_synthetic": true,
-      "icon_url": "https://api.dicebear.com/9.x/notionists/png?size=128&backgroundColor=f4ede4&seed=Ana%20Rivera"
+      "icon_url": "https://raw.githubusercontent.com/FrancesCoronel/madrina/main/assets/personas/ana.jpg"
     },
     "dana": {
       "name": "Dana Brooks",
       "role": "Engineering Manager, Payments Platform (Ana's manager)",
       "icon_emoji": ":female-office-worker:",
       "_synthetic": true,
-      "icon_url": "https://api.dicebear.com/9.x/notionists/png?size=128&backgroundColor=f4ede4&seed=Dana%20Brooks"
+      "icon_url": "https://raw.githubusercontent.com/FrancesCoronel/madrina/main/assets/personas/dana.jpg"
     },
     "priya": {
       "name": "Priya Nair",
       "role": "Product Manager, Billing",
       "icon_emoji": ":bar_chart:",
       "_synthetic": true,
-      "icon_url": "https://api.dicebear.com/9.x/notionists/png?size=128&backgroundColor=f4ede4&seed=Priya%20Nair"
+      "icon_url": "https://raw.githubusercontent.com/FrancesCoronel/madrina/main/assets/personas/priya.jpg"
     },
     "marcus": {
       "name": "Marcus Lee",
       "role": "Engineering Manager, Billing",
       "icon_emoji": ":male-technologist:",
       "_synthetic": true,
-      "icon_url": "https://api.dicebear.com/9.x/notionists/png?size=128&backgroundColor=f4ede4&seed=Marcus%20Lee"
+      "icon_url": "https://raw.githubusercontent.com/FrancesCoronel/madrina/main/assets/personas/marcus.jpg"
     },
     "tess": {
       "name": "Tess Romero",
       "role": "Support Lead",
       "icon_emoji": ":headphones:",
       "_synthetic": true,
-      "icon_url": "https://api.dicebear.com/9.x/notionists/png?size=128&backgroundColor=f4ede4&seed=Tess%20Romero"
+      "icon_url": "https://raw.githubusercontent.com/FrancesCoronel/madrina/main/assets/personas/tess.jpg"
     },
     "rafael": {
       "name": "Rafael Duarte",
       "role": "Tech Lead, Identity (Gateway partner team)",
       "icon_emoji": ":key:",
       "_synthetic": true,
-      "icon_url": "https://api.dicebear.com/9.x/notionists/png?size=128&backgroundColor=f4ede4&seed=Rafael%20Duarte"
+      "icon_url": "https://raw.githubusercontent.com/FrancesCoronel/madrina/main/assets/personas/rafael.jpg"
     },
     "sam": {
       "name": "Sam Ortiz",
       "role": "Software Engineer, Payments Platform (new hire)",
       "icon_emoji": ":seedling:",
       "_synthetic": true,
-      "icon_url": "https://api.dicebear.com/9.x/notionists/png?size=128&backgroundColor=f4ede4&seed=Sam%20Ortiz"
+      "icon_url": "https://raw.githubusercontent.com/FrancesCoronel/madrina/main/assets/personas/sam.jpg"
     }
   },
   "channels": [
