@@ -56,6 +56,16 @@
       "icon_url": "https://raw.githubusercontent.com/FrancesCoronel/madrina/main/assets/personas/sam.jpg"
     }
   },
+  "live_asks": [
+    {
+      "_synthetic": true,
+      "_note": "Posted on cue during the demo with `pnpm tsx scripts/post-live-ask.ts dana-swag`, so the glue-work flag fires live. seed-slack.ts does not post these.",
+      "id": "dana-swag",
+      "channel": "ana-dana-1on1",
+      "from": "dana",
+      "text": "One more thing :gift: could you coordinate the team swag before the offsite on Nov 19? Picking the vendor, collecting sizes, and getting it shipped to the remote folks. You're always so good at this stuff."
+    }
+  ],
   "channels": [
     {
       "name": "proj-gateway-migration",
@@ -215,6 +225,17 @@
           "from": "sam",
           "thread": "p-2",
           "text": "Thank you Ana, the guide is great :sparkles:"
+        },
+        {
+          "id": "p-3",
+          "from": "ana",
+          "text": ":pager: *On-call handoff, week of Oct 26*\n• Billing webhook latency alert fired twice, both self-resolved\n• Refunds dashboard is slow to load, ticket filed\n• Nothing paging right now. Have a quiet week!"
+        },
+        {
+          "id": "p-3r",
+          "from": "dana",
+          "thread": "p-3",
+          "text": "Thanks Ana, you always write the best handoffs :pray:"
         }
       ]
     }
