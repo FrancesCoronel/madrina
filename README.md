@@ -3,6 +3,9 @@
   <h1>Madrina</h1>
 </div>
 
+> [!NOTE]
+> **Madrina has moved.** 📦 This repo is the archived hackathon version from 2026-11-06. New work happens in the [Latina Dev repo](https://github.com/Latina-Dev/latina-dev), in the `apps/madrina` folder, where Madrina is being rebuilt for the Latina Dev Slack community.
+
 A career coach in Slack for women software engineers, built on Claude. Madrina shows your path to your next level, catches when your work drifts away from what your manager said matters, and turns your wins into promo-ready bullets.
 
 *Madrina* means godmother in Spanish: the woman who vouches for you.
@@ -17,7 +20,7 @@ A career coach in Slack for women software engineers, built on Claude. Madrina s
 | **Built by** | Frances Coronel |
 | **Status** | Hackathon demo. Runs locally with the Slack CLI; deploys to Vercel |
 | **Data** | 100% synthetic. Ana Rivera, her manager Dana and everyone else in `data/` are made up |
-| **Next** | Ships to the [Latina.dev](https://latina.dev) Slack community |
+| **Next** | Moved to the [Latina Dev repo](https://github.com/Latina-Dev/latina-dev) (`apps/madrina`), on its way to the [Latina.dev](https://latina.dev) Slack community |
 
 ## The problem 📉
 
